@@ -7,3 +7,4 @@ matplotlib
 numpy
 xgboost
 seaborn==0.13.2
+wordcloud==1.9.3
