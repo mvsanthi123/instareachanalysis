@@ -6,3 +6,4 @@ pandas
 matplotlib
 numpy
 xgboost
+seaborn==0.13.2
