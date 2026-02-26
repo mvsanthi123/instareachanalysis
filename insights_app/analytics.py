@@ -1,5 +1,5 @@
 # insights_app/analytics.py
-
+print("Analytics file loaded successfully")
 import pandas as pd
 import numpy as np
 import matplotlib
