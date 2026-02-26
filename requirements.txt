@@ -1,2 +1,8 @@
 flask
 gunicorn
+Django
+gunicorn
+pandas
+matplotlib
+numpy
+xgboost
