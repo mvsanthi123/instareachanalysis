@@ -2,7 +2,8 @@
 print("Analytics file loaded successfully")
 import pandas as pd
 import numpy as np
-import matplotlib
+#import matplotlib
+import chart.js
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
