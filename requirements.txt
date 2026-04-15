@@ -2,10 +2,11 @@ xgboost==2.0.3
 Django==5.0.6
 gunicorn==22.0.0
 numpy==1.26.4
-pandas==2.2.2
+pandas==2.1.4
 matplotlib==3.8.4
 seaborn==0.13.2
 wordcloud==1.9.3
 pillow==10.3.0
 scikit-learn==1.4.2
 whitenoise==6.6.0
+python-3.11.9
