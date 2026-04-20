@@ -4,19 +4,28 @@ import matplotlib
 matplotlib.use('Agg')
 
 from django.shortcuts import render
-from .analytics import (
-    load_data,
-    evaluate_model
-)
+from .analytics import load_data, evaluate_model
+
+# ✅ DEFINE BASE_DIR (FIX)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
 def dashboard(request):
 
+    # ✅ Correct path to CSV
     data_path = os.path.join(
         BASE_DIR, 'insights_app', 'static', 'insights_app', 'Instagram data.csv'
     )
 
-    df = load_data(data_path)
+    # ✅ Load data safely
+    try:
+        df = load_data(data_path)
+    except Exception as e:
+        return render(request, 'insights_app/dashboard.html', {
+            'error': f"Error loading data: {e}"
+        })
 
-    # SAFE columns
+    # ================= SAFE COLUMNS =================
     if 'Date' in df.columns:
         df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
         df['Day'] = df['Date'].dt.day_name()
@@ -30,7 +39,7 @@ def dashboard(request):
             lambda x: len(x.split()) if x not in ['0', ''] else 0
         )
 
-    # METRICS (lightweight)
+    # ================= METRICS =================
     metrics = {}
     try:
         metrics = evaluate_model(df['Impressions'], df['Likes'])
@@ -38,9 +47,10 @@ def dashboard(request):
         metrics['total_posts'] = len(df)
         metrics['total_impressions'] = int(df['Impressions'].sum())
         metrics['total_likes'] = int(df['Likes'].sum())
-    except:
-        pass
+    except Exception as e:
+        metrics['error'] = str(e)
 
+    # ================= INSIGHTS =================
     insights = [
         "📅 Best reach happens on Mondays.",
         "⏰ Best engagement between 6 AM – 8 AM.",
@@ -53,6 +63,7 @@ def dashboard(request):
         "🤖 ML shows timing & format matter most."
     ]
 
+    # ================= RESPONSE =================
     return render(request, 'insights_app/dashboard.html', {
         'metrics': metrics,
         'insights': insights,
