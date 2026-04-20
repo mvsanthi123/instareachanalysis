@@ -12,8 +12,7 @@ from .analytics import (
     plot_interaction_distribution,
     plot_correlation_matrix,
     plot_relationship,
-    evaluate_model,
-    ensure_output_dir
+    evaluate_model
 )
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,18 +24,18 @@ def dashboard(request):
     data_path = os.path.join(
         BASE_DIR, 'insights_app', 'static', 'insights_app', 'Instagram data.csv'
     )
-    output_dir = os.path.join(
-        BASE_DIR, 'insights_app', 'static', 'insights_app', 'images'
-    )
 
-    ensure_output_dir(output_dir)
+    # ✅ FIX: use writable temp directory instead of static
+    output_dir = '/tmp/images'
+    os.makedirs(output_dir, exist_ok=True)
+
+    # ---------------- LOAD DATA ----------------
     df = load_data(data_path)
 
     # =====================================================
-    # 🔐 SAFE COLUMN CREATION (NO ASSUMPTIONS)
+    # 🔐 SAFE COLUMN CREATION
     # =====================================================
 
-    # Date → Day & Hour
     if 'Date' in df.columns:
         df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
 
@@ -46,146 +45,110 @@ def dashboard(request):
         if 'Hour' not in df.columns:
             df['Hour'] = df['Date'].dt.hour
 
-    # Caption Length
     if 'Caption Length' not in df.columns and 'Caption' in df.columns:
         df['Caption Length'] = df['Caption'].astype(str).apply(len)
 
-    # Hashtag Count
     if 'Hashtag Count' not in df.columns and 'Hashtags' in df.columns:
         df['Hashtag Count'] = df['Hashtags'].astype(str).apply(
             lambda x: len(x.split()) if x not in ['0', ''] else 0
         )
 
-    # Media Type
     if 'Media Type' not in df.columns:
         df['Media Type'] = 'Post'
 
-    # ---------------- EXISTING PLOTS ----------------
-    generate_wordcloud(df['Caption'], os.path.join(output_dir, 'caption_wc.png'))
-    generate_wordcloud(df['Hashtags'], os.path.join(output_dir, 'hashtag_wc.png'))
+    # =====================================================
+    # 📊 GENERATE PLOTS (WRITE TO /tmp)
+    # =====================================================
 
-    plot_interaction_distribution(df, output_dir)
-    plot_correlation_matrix(df, os.path.join(output_dir, 'correlation_matrix.png'))
+    try:
+        generate_wordcloud(df['Caption'], os.path.join(output_dir, 'caption_wc.png'))
+        generate_wordcloud(df['Hashtags'], os.path.join(output_dir, 'hashtag_wc.png'))
 
-    plot_relationship(
-        df, 'Likes', 'Impressions',
-        os.path.join(output_dir, 'likes_vs_impressions.png'),
-        'Likes vs Impressions'
-    )
+        plot_interaction_distribution(df, output_dir)
 
-    plot_relationship(
-        df, 'Profile Visits', 'Follows',
-        os.path.join(output_dir, 'profile_vs_follows.png'),
-        'Profile Visits vs Follows'
-    )
+        plot_correlation_matrix(
+            df,
+            os.path.join(output_dir, 'correlation_matrix.png')
+        )
 
-    plot_relationship(
-        df, 'Comments', 'Impressions',
-        os.path.join(output_dir, 'comments_vs_impressions.png'),
-        'Comments vs Impressions'
-    )
+        plot_relationship(
+            df, 'Likes', 'Impressions',
+            os.path.join(output_dir, 'likes_vs_impressions.png'),
+            'Likes vs Impressions'
+        )
 
-    plot_relationship(
-        df, 'Saves', 'Impressions',
-        os.path.join(output_dir, 'saves_vs_impressions.png'),
-        'Saves vs Impressions'
-    )
+        plot_relationship(
+            df, 'Profile Visits', 'Follows',
+            os.path.join(output_dir, 'profile_vs_follows.png'),
+            'Profile Visits vs Follows'
+        )
 
-    # ---------------- METRICS ----------------
-    y_true = df['Impressions']
-    y_pred = df['Likes']
-    metrics = evaluate_model(y_true, y_pred)
+        plot_relationship(
+            df, 'Comments', 'Impressions',
+            os.path.join(output_dir, 'comments_vs_impressions.png'),
+            'Comments vs Impressions'
+        )
 
-    metrics['TT'] = '0.12s'
-    metrics['total_posts'] = len(df)
-    metrics['total_impressions'] = int(df['Impressions'].sum())
-    metrics['total_likes'] = int(df['Likes'].sum())
+        plot_relationship(
+            df, 'Saves', 'Impressions',
+            os.path.join(output_dir, 'saves_vs_impressions.png'),
+            'Saves vs Impressions'
+        )
+
+    except Exception as e:
+        print("Error generating plots:", e)
 
     # =====================================================
-    # 💡 AUTO INSIGHTS (GRAPH-DRIVEN, REAL-WORLD)
+    # 📈 METRICS
     # =====================================================
-    insights = []
 
-    # ---------- BEST DAY ----------
-    insights.append(
-        "📅 Posts achieve the highest average reach on Mondays. "
-        "This indicates stronger audience activity at the beginning of the week. "
-        "Schedule important announcements, launches, or promotions on Mondays for maximum visibility."
-    )
+    metrics = {}
+    try:
+        y_true = df['Impressions']
+        y_pred = df['Likes']
+        metrics = evaluate_model(y_true, y_pred)
 
-    # ---------- BEST HOUR ----------
-    insights.append(
-        "⏰ Engagement peaks during early morning hours, especially between 6 AM and 8 AM. "
-        "Posting during this window helps content appear when users first check Instagram."
-    )
+        metrics['TT'] = '0.12s'
+        metrics['total_posts'] = len(df)
+        metrics['total_impressions'] = int(df['Impressions'].sum())
+        metrics['total_likes'] = int(df['Likes'].sum())
 
-    # ---------- DAY + HOUR COMBINATION ----------
-    insights.append(
-        "📊 Combined analysis of day and hour reveals that Monday mornings consistently outperform "
-        "other posting times. This is the most effective slot for high-impact posts."
-    )
+    except Exception as e:
+        print("Error calculating metrics:", e)
 
-    # ---------- CAPTION LENGTH ----------
-    insights.append(
-        "✍️ Medium-length captions (approximately 100–250 characters) perform best. "
-        "They provide enough context without overwhelming the audience."
-    )
+    # =====================================================
+    # 💡 INSIGHTS
+    # =====================================================
 
-    # ---------- HASHTAG COUNT ----------
-    insights.append(
-        "#️⃣ Posts using a moderate hashtag range (8–12 hashtags) achieve better discoverability. "
-        "Excessive hashtags reduce engagement quality."
-    )
+    insights = [
+        "📅 Best reach happens on Mondays.",
+        "⏰ Best engagement between 6 AM – 8 AM.",
+        "📊 Monday mornings perform best overall.",
+        "✍️ Medium captions perform best.",
+        "#️⃣ 8–12 hashtags give best results.",
+        "🎥 Images perform best overall.",
+        "🚀 Consistency improves reach.",
+        "🔥 Saves & shares indicate strong content.",
+        "🤖 ML shows timing & format matter most."
+    ]
 
-    # ---------- MEDIA TYPE ----------
-    insights.append(
-        "🎥 Static image posts generate the highest impressions overall, followed by videos. "
-        "Reels perform best when posted during peak hours and paired with visually strong content."
-    )
+    # =====================================================
+    # 📦 CONTEXT
+    # =====================================================
 
-    # ---------- CONTENT STRATEGY ----------
-    insights.append(
-        "🚀 Consistent posting during peak time windows significantly improves reach. "
-        "Accounts that maintain a predictable posting schedule show sustained growth."
-    )
-
-    # ---------- ENGAGEMENT QUALITY ----------
-    insights.append(
-        "🔥 Posts with higher saves and shares indicate strong content value. "
-        "Educational, tips-based, and informative posts tend to perform best long-term."
-    )
-
-    # ---------- MACHINE LEARNING INTERPRETATION ----------
-    insights.append(
-        "🤖 Machine learning analysis identifies posting time, media format, and hashtag usage "
-        "as the most influential factors affecting Instagram post performance."
-    )
-
-    # ---------------- CONTEXT ----------------
     context = {
         'metrics': metrics,
         'insights': insights,
-        'model_feature_images': [
-            '15featuresofXGBoost.jpg',
-            'xgboost.jpg',
-            'model_comparison.jpg',
-            'model_comparison1.jpg',
-            'prediction_error.jpg',
-            'residual.jpg'
-        ],
-        'best_time_images': [
-            'bestday.jpg',
-            'besthour.jpg',
-            'avgreachbydayandhour.jpg',
-            'avgreachbycaptionlength.jpg'
-        ],
-        'hashtag_caption_images': [
-            'besthashtagcount.jpg',
-            'captionwordcloud.jpg',
-            'hashtagwordcloud.jpg'
-        ],
-        'media_type_images': [
-            'bestmediatype.jpg'
+
+        # ⚠️ TEMP: filenames only (not static paths)
+        'generated_images': [
+            'caption_wc.png',
+            'hashtag_wc.png',
+            'correlation_matrix.png',
+            'likes_vs_impressions.png',
+            'profile_vs_follows.png',
+            'comments_vs_impressions.png',
+            'saves_vs_impressions.png'
         ]
     }
 
