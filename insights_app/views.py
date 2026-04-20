@@ -70,9 +70,9 @@ def dashboard(request):
         'model_feature_images': [
             '15featuresofXGBoost.jpg',
             'xgboost.jpg',
-            'model_comparison.jpg',
-            'model_comparison1.jpg',
-            'prediction_error.jpg',
+            'model comparision.jpg',
+            'model comparision1.jpg',
+            'predicion error.jpg',
             'residual.jpg'
         ],
         'best_time_images': [
