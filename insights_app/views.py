@@ -1,3 +1,13 @@
+import os
+import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
+
+from django.shortcuts import render
+from .analytics import (
+    load_data,
+    evaluate_model
+)
 def dashboard(request):
 
     data_path = os.path.join(
