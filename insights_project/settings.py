@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = True
 
 # ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['instareachanalysiss1.onrender.com']
+ALLOWED_HOSTS = ['instareachanalysiss-1.onrender.com']
 
 # Application definition
 
