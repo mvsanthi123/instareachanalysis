@@ -1,14 +1,24 @@
 {% load static %} 
 <!DOCTYPE html> 
 <html lang="en"> 
+
 <head> 
 <meta charset="UTF-8"> 
 <title>Instagram Insights Dashboard</title> 
 <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
 
 <style> 
-:root{ --primary:#6366f1; --accent:#ec4899; } 
-*{margin:0;padding:0;box-sizing:border-box} 
+
+:root{ 
+  --primary:#6366f1; 
+  --accent:#ec4899; 
+} 
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+} 
 
 body{ 
   font-family:'Segoe UI',sans-serif; 
@@ -17,6 +27,7 @@ body{
 } 
 
 /* ================= HEADER ================= */ 
+
 .app-header{ 
   display:flex; 
   justify-content:center; 
@@ -47,16 +58,30 @@ body{
   animation:glowPulse 3s infinite; 
 } 
 
-.logo-box h1{ font-size:1.6rem; color:#111827; } 
-.logo-box p{ font-size:.95rem; color:#6b7280; } 
+.logo-box h1{ 
+  font-size:1.6rem; 
+  color:#111827; 
+} 
+
+.logo-box p{ 
+  font-size:.95rem; 
+  color:#6b7280; 
+} 
 
 @keyframes glowPulse{ 
-  0%{box-shadow:0 0 0 rgba(99,102,241,.4)} 
-  50%{box-shadow:0 0 35px rgba(99,102,241,.6)} 
-  100%{box-shadow:0 0 0 rgba(99,102,241,.4)} 
+  0%{
+    box-shadow:0 0 0 rgba(99,102,241,.4)
+  } 
+  50%{
+    box-shadow:0 0 35px rgba(99,102,241,.6)
+  } 
+  100%{
+    box-shadow:0 0 0 rgba(99,102,241,.4)
+  } 
 } 
 
 /* ================= TABS ================= */ 
+
 .tabs{ 
   position:sticky; 
   top:0; 
@@ -96,34 +121,47 @@ body{
 } 
 
 /* ================= SECTIONS ================= */ 
+
 .section{ 
   display:none; 
   padding:30px; 
   animation:fadeSlide .6s ease; 
 } 
 
-.section.active{display:block} 
+.section.active{
+  display:block
+} 
 
 @keyframes fadeSlide{ 
-  from{opacity:0;transform:translateY(25px)} 
-  to{opacity:1;transform:translateY(0)} 
+  from{
+    opacity:0;
+    transform:translateY(25px)
+  } 
+  to{
+    opacity:1;
+    transform:translateY(0)
+  } 
 } 
 
-/* ================= GRID & CARDS ================= */ 
+/* ================= GRID ================= */ 
+
 .grid{ 
   display:grid; 
-  grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); 
+  grid-template-columns:repeat(auto-fit,minmax(500px,1fr)); 
   gap:25px; 
 } 
+
+/* ================= CARDS ================= */ 
 
 .card{ 
   background:rgba(255,255,255,.8); 
   backdrop-filter:blur(12px); 
   border-radius:18px; 
-  padding:20px; 
+  padding:25px; 
   text-align:center; 
   box-shadow:0 15px 30px rgba(0,0,0,.12); 
   transition:.4s; 
+  overflow:auto;
 } 
 
 .card:hover{ 
@@ -133,18 +171,22 @@ body{
 
 .card img{ 
   width:100%; 
-  height:280px; 
+  height:auto;
+  min-height:420px;
   object-fit:contain; 
-  border-radius:12px; 
+  border-radius:12px;
+  padding:10px;
 } 
 
 .card-title{ 
   margin-top:12px; 
   font-weight:600; 
   color:#374151; 
+  font-size:18px;
 } 
 
 /* ================= METRICS ================= */ 
+
 .metrics-box{ 
   background:rgba(255,255,255,.75); 
   padding:30px; 
@@ -154,7 +196,15 @@ body{
   margin:auto; 
 } 
 
-/* ================= AUTO INSIGHTS SCROLL ================= */ 
+.metrics-box p{
+  font-size:18px;
+  margin-bottom:12px;
+  color:#374151;
+  font-weight:600;
+}
+
+/* ================= AUTO INSIGHTS ================= */ 
+
 .insight-box { 
   background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); 
   border-radius: 16px; 
@@ -162,6 +212,10 @@ body{
   color: #fff; 
   box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3); 
 } 
+
+.insight-box h2{
+  margin-bottom:20px;
+}
 
 .insight-scroll { 
   height: 220px; 
@@ -185,13 +239,40 @@ body{
 } 
 
 @keyframes scrollInsights { 
-  0% { transform: translateY(0%); } 
-  100% { transform: translateY(-100%); } 
+  0% { 
+    transform: translateY(0%); 
+  } 
+  100% { 
+    transform: translateY(-100%); 
+  } 
 } 
 
 .insight-scroll:hover ul { 
   animation-play-state: paused; 
 } 
+
+/* ================= RESPONSIVE ================= */ 
+
+@media(max-width:768px){
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .card img{
+    min-height:300px;
+  }
+
+  .logo-box{
+    flex-direction:column;
+    text-align:center;
+  }
+
+  .logo-box h1{
+    font-size:1.3rem;
+  }
+}
+
 </style> 
 </head> 
 
@@ -221,50 +302,130 @@ body{
   <button class="tab-btn" onclick="showTab('auto_insights',this)">💡 Insights</button> 
 </div> 
 
+<!-- ================= OVERVIEW ================= -->
+
 <section id="overview" class="section active"> 
   <div class="grid"> 
-    <div class="card"><h2>Total Posts</h2><h1>{{ metrics.total_posts }}</h1></div> 
-    <div class="card"><h2>Total Impressions</h2><h1>{{ metrics.total_impressions }}</h1></div> 
-    <div class="card"><h2>Total Likes</h2><h1>{{ metrics.total_likes }}</h1></div> 
+    <div class="card">
+      <h2>Total Posts</h2>
+      <h1>{{ metrics.total_posts }}</h1>
+    </div> 
+
+    <div class="card">
+      <h2>Total Impressions</h2>
+      <h1>{{ metrics.total_impressions }}</h1>
+    </div> 
+
+    <div class="card">
+      <h2>Total Likes</h2>
+      <h1>{{ metrics.total_likes }}</h1>
+    </div> 
   </div> 
 </section> 
+
+<!-- ================= WORDCLOUDS ================= -->
 
 <section id="wordclouds" class="section"> 
   <div class="grid"> 
-    <div class="card"><img src="{% static 'insights_app/images/caption_wc.png' %}"><div class="card-title">Caption Wordcloud</div></div> 
-    <div class="card"><img src="{% static 'insights_app/images/hashtag_wc.png' %}"><div class="card-title">Hashtag Wordcloud</div></div> 
+
+    <div class="card">
+      <img src="{% static 'insights_app/images/caption_wc.png' %}">
+      <div class="card-title">Caption Wordcloud</div>
+    </div> 
+
+    <div class="card">
+      <img src="{% static 'insights_app/images/hashtag_wc.png' %}">
+      <div class="card-title">Hashtag Wordcloud</div>
+    </div> 
+
   </div> 
 </section> 
+
+<!-- ================= INTERACTIONS ================= -->
 
 <section id="interactions" class="section"> 
   <div class="grid"> 
-    <div class="card"><img src="{% static 'insights_app/images/interaction_bar.png' %}"></div> 
-    <div class="card"><img src="{% static 'insights_app/images/interaction_pie.png' %}"></div> 
-    <div class="card"><img src="{% static 'insights_app/images/likes_vs_impressions.png' %}"></div> 
-    <div class="card"><img src="{% static 'insights_app/images/comments_vs_impressions.png' %}"></div> 
-    <div class="card"><img src="{% static 'insights_app/images/saves_vs_impressions.png' %}"></div> 
-    <div class="card"><img src="{% static 'insights_app/images/shares_vs_impressions.png' %}"></div> 
+
+    <div class="card">
+      <img src="{% static 'insights_app/images/interaction_bar.png' %}">
+    </div> 
+
+    <div class="card">
+      <img src="{% static 'insights_app/images/interaction_pie.png' %}">
+    </div> 
+
+    <div class="card">
+      <img src="{% static 'insights_app/images/likes_vs_impressions.png' %}">
+    </div> 
+
+    <div class="card">
+      <img src="{% static 'insights_app/images/comments_vs_impressions.png' %}">
+    </div> 
+
+    <div class="card">
+      <img src="{% static 'insights_app/images/saves_vs_impressions.png' %}">
+    </div> 
+
+    <div class="card">
+      <img src="{% static 'insights_app/images/shares_vs_impressions.png' %}">
+    </div> 
+
   </div> 
 </section> 
+
+<!-- ================= TRENDS ================= -->
 
 <section id="trends" class="section"> 
   <div class="grid"> 
-    <div class="card"><img src="{% static 'insights_app/images/top20_hashtags.png' %}"></div> 
-    <div class="card"><img src="{% static 'insights_app/images/correlation_matrix.png' %}"></div> 
-    <div class="card"><img src="{% static 'insights_app/images/profile_vs_follows.png' %}"></div> 
-    <div class="card"><img src="{% static 'insights_app/images/reach_by_post_type.png' %}"></div> 
+
+    <div class="card">
+      <img src="{% static 'insights_app/images/top20_hashtags.png' %}">
+    </div> 
+
+    <div class="card">
+      <img src="{% static 'insights_app/images/correlation_matrix.png' %}">
+    </div> 
+
+    <div class="card">
+      <img src="{% static 'insights_app/images/profile_vs_follows.png' %}">
+    </div> 
+
+    <div class="card">
+      <img src="{% static 'insights_app/images/reach_by_post_type.png' %}">
+    </div> 
+
   </div> 
 </section> 
 
+<!-- ================= MORE ANALYTICS ================= -->
+
 <section id="more" class="section"> 
   <div class="grid"> 
-    <div class="card"><img src="{% static 'insights_app/images/reach_trend.png' %}"></div> 
-    <div class="card"><img src="{% static 'insights_app/images/engagement_over_time.png' %}"></div> 
-    <div class="card"><img src="{% static 'insights_app/images/followers_growth.png' %}"></div> 
-    <div class="card"><img src="{% static 'insights_app/images/top_post_formats.png' %}"></div> 
-    <div class="card"><img src="{% static 'insights_app/images/hashtag_engagement.png' %}"></div> 
+
+    <div class="card">
+      <img src="{% static 'insights_app/images/reach_trend.png' %}">
+    </div> 
+
+    <div class="card">
+      <img src="{% static 'insights_app/images/engagement_over_time.png' %}">
+    </div> 
+
+    <div class="card">
+      <img src="{% static 'insights_app/images/followers_growth.png' %}">
+    </div> 
+
+    <div class="card">
+      <img src="{% static 'insights_app/images/top_post_formats.png' %}">
+    </div> 
+
+    <div class="card">
+      <img src="{% static 'insights_app/images/hashtag_engagement.png' %}">
+    </div> 
+
   </div> 
 </section> 
+
+<!-- ================= METRICS ================= -->
 
 <section id="metrics" class="section"> 
   <div class="metrics-box"> 
@@ -276,73 +437,131 @@ body{
   </div> 
 </section> 
 
+<!-- ================= MODEL FEATURES ================= -->
+
 <section id="model_features" class="section"> 
   <div class="grid"> 
+
     {% for img in model_feature_images %} 
-    <div class="card"><img src="{% static 'insights_app/images/'|add:img %}"></div> 
+
+    <div class="card">
+      <img src="{% static 'insights_app/images/'|add:img %}">
+    </div> 
+
     {% endfor %} 
+
   </div> 
 </section> 
+
+<!-- ================= BEST TIME ================= -->
 
 <section id="best_time" class="section"> 
   <div class="grid"> 
+
     {% for img in best_time_images %} 
-    <div class="card"><img src="{% static 'insights_app/images/'|add:img %}"></div> 
+
+    <div class="card">
+      <img src="{% static 'insights_app/images/'|add:img %}">
+    </div> 
+
     {% endfor %} 
+
   </div> 
 </section> 
+
+<!-- ================= HASHTAG CAPTION ================= -->
 
 <section id="hashtag_caption" class="section"> 
   <div class="grid"> 
+
     {% for img in hashtag_caption_images %} 
-    <div class="card"><img src="{% static 'insights_app/images/'|add:img %}"></div> 
+
+    <div class="card">
+      <img src="{% static 'insights_app/images/'|add:img %}">
+    </div> 
+
     {% endfor %} 
+
   </div> 
 </section> 
+
+<!-- ================= MEDIA TYPE ================= -->
 
 <section id="media_type" class="section"> 
   <div class="grid"> 
+
     {% for img in media_type_images %} 
-    <div class="card"><img src="{% static 'insights_app/images/'|add:img %}"></div> 
+
+    <div class="card">
+      <img src="{% static 'insights_app/images/'|add:img %}">
+    </div> 
+
     {% endfor %} 
+
   </div> 
 </section> 
+
+<!-- ================= AUTO INSIGHTS ================= -->
 
 <section id="auto_insights" class="section"> 
   <div class="insight-box"> 
+
     <h2>💡 Actionable Instagram Insights</h2> 
+
     <div class="insight-scroll" id="insightScroll"> 
       <ul> 
+
         {% for insight in insights %} 
         <li>{{ insight }}</li> 
         {% endfor %} 
+
       </ul> 
     </div> 
+
   </div> 
 </section> 
 
-<script> 
-function showTab(id,btn){ 
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); 
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); 
-  document.getElementById(id).classList.add('active'); 
-  btn.classList.add('active'); 
-} 
-</script> 
+<!-- ================= TAB SCRIPT ================= -->
 
 <script> 
+
+function showTab(id,btn){ 
+
+  document.querySelectorAll('.section').forEach(
+    s => s.classList.remove('active')
+  ); 
+
+  document.querySelectorAll('.tab-btn').forEach(
+    b => b.classList.remove('active')
+  ); 
+
+  document.getElementById(id).classList.add('active'); 
+
+  btn.classList.add('active'); 
+} 
+
+</script> 
+
+<!-- ================= INSIGHT SCROLL ================= -->
+
+<script> 
+
 const insightScroll = document.getElementById("insightScroll"); 
 const insightList = insightScroll.querySelector("ul"); 
 let resumeTimeout = null; 
 
 insightScroll.addEventListener("click", () => { 
+
   insightList.style.animationPlayState = "paused"; 
 
   clearTimeout(resumeTimeout); 
+
   resumeTimeout = setTimeout(() => { 
     insightList.style.animationPlayState = "running"; 
   }, 3000); 
+
 }); 
+
 </script> 
 
 </body> 
