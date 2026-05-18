@@ -57,10 +57,9 @@ def dashboard(request):
         "📊 Monday mornings perform best overall.",
         "✍️ Medium captions perform best.",
         "#️⃣ 8–12 hashtags give best results.",
-        "🎥 Images perform best overall.",
+        "🎥 Vedios perform best overall.",
         "🚀 Consistency improves reach.",
-        "🔥 Saves & shares indicate strong content.",
-        "🤖 ML shows timing & format matter most."
+        "🔥 Saves & shares indicate strong content."
     ]
 
     # ================= RESPONSE =================
